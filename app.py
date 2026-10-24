@@ -5,7 +5,7 @@ import tempfile
 
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
-from PIL import Image, ImageDraw
+from PIL import Image
 
 from censor import process_image
 
@@ -21,16 +21,6 @@ VALID_TARGETS = {"arc", "test", "rendszam"}
 @app.route("/")
 def index():
     return send_from_directory(BASE_DIR, "index.html")
-
-
-def _box_tuple(det):
-    box = det.get("box", {})
-    return (
-        int(box["xmin"]),
-        int(box["ymin"]),
-        int(box["xmax"]),
-        int(box["ymax"]),
-    )
 
 
 @app.route("/censor", methods=["POST"])
@@ -49,8 +39,6 @@ def censor():
         return jsonify({"error": f"Ismeretlen style: {style}"}), 400
 
     censor_mode = STYLE_MAP[style]
-    only_head = target == "arc"
-    wanted_type = "license_plate" if target == "rendszam" else "person"
 
     # --- Kép beolvasása memóriából ---
     try:
@@ -60,7 +48,7 @@ def censor():
     except Exception:
         return jsonify({"error": "A feltöltött fájl nem érvényes kép."}), 400
 
-    # A backend fájlútvonalat vár, ezért ideiglenes fájlba mentjük a képet.
+    # Ideiglenes fájlba mentés és feldolgozás
     tmp_path = None
     try:
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
@@ -71,9 +59,9 @@ def censor():
             tmp_path,
             output_image_path=None,
             confidence_threshold=0.4,
+            target=target,
             censor_mode=censor_mode,
             blur_radius=25,
-            only_head_for_person=only_head,
         )
     except Exception as e:
         return jsonify({"error": f"Feldolgozási hiba: {e}"}), 500
@@ -81,34 +69,13 @@ def censor():
         if tmp_path and os.path.exists(tmp_path):
             os.remove(tmp_path)
 
+    # --- Base64 PNG válasz előállítása ---
     result_img = result_img.convert("RGB")
-    detections = detections or []
-
-    # --- Szűrés a kért célpont szerint ---
-    # A process_image minden érzékeny területet cenzúráz, ezért a nem kért
-    # típusok területén visszaállítjuk az eredeti képet. A kért típusok
-    # dobozait kivesszük a visszaállítási maszkból, így átfedésnél sem
-    # lesz felfedve a cenzúrázandó rész.
-    wanted = [d for d in detections if d.get("type") == wanted_type]
-    unwanted = [d for d in detections if d.get("type") != wanted_type]
-
-    if unwanted:
-        if original.size != result_img.size:
-            original = original.resize(result_img.size)
-        mask = Image.new("L", result_img.size, 0)
-        draw = ImageDraw.Draw(mask)
-        for d in unwanted:
-            draw.rectangle(_box_tuple(d), fill=255)
-        for d in wanted:
-            draw.rectangle(_box_tuple(d), fill=0)
-        result_img.paste(original, (0, 0), mask)
-
-    # --- Base64 PNG ---
     buf = io.BytesIO()
     result_img.save(buf, format="PNG")
     b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
 
-    return jsonify({"image": b64, "detections": len(wanted)})
+    return jsonify({"image": b64, "detections": len(detections)})
 
 
 if __name__ == "__main__":
