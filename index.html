@@ -1,9 +1,12 @@
-<title>Kitakaró Chat</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<title>Kitakaró AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: egyképernyős chat – fejléc, görgethető üzenetfolyam, alul rögzített beviteli sáv */
 :root{
   --bg:#f3f2f7; --panel:#ffffff; --fg:#1b1a24; --muted:#6b6880; --line:#dcdae6;
   --accent:#c2185b; --accent-fg:#ffffff; --bubble-me:#1b1a24; --bubble-me-fg:#f3f2f7;
@@ -20,7 +23,7 @@
   --bg:#121119; --panel:#1c1b26; --fg:#ecebf3; --muted:#9a97ad; --line:#2e2c3c;
   --accent:#ff4f8b; --accent-fg:#16030a; --bubble-me:#ecebf3; --bubble-me-fg:#121119;
   --ok:#4fd08f; --err:#ff8a80; color-scheme:dark}
-html,body{height:100%}
+html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5}
 .app{height:100%;display:flex;flex-direction:column;max-width:860px;margin:0 auto;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
@@ -29,17 +32,11 @@ header{display:flex;align-items:center;gap:12px;padding-block:14px;border-bottom
 .logo .bar{display:inline-block;width:34px;height:12px;background:var(--fg);border-radius:2px}
 .logo em{font-style:normal;background:var(--accent);color:var(--accent-fg);padding:0 6px;border-radius:3px}
 .status{margin-left:auto;font-family:var(--f-mono);font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
-.dot.live{background:var(--ok)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
 button{font:inherit;cursor:pointer}
 .iconbtn{border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:8px;padding:6px 10px;font-size:13px}
 .iconbtn:hover{border-color:var(--fg)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-#settings{border-bottom:1px solid var(--line);padding-block:12px;display:grid;gap:8px}
-#settings label{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
-#settings input{width:100%;font-family:var(--f-mono);font-size:13px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--fg)}
-#settings p{margin:0;font-size:13px;color:var(--muted)}
-#settings code{font-family:var(--f-mono);font-size:12px}
 main{flex:1;overflow-y:auto;padding-block:20px;display:flex;flex-direction:column;gap:16px}
 .msg{display:flex;flex-direction:column;gap:6px;max-width:min(560px,88%);min-width:0}
 .msg.me{align-self:flex-end;align-items:flex-end}
@@ -60,8 +57,6 @@ main{flex:1;overflow-y:auto;padding-block:20px;display:flex;flex-direction:colum
 .err{color:var(--err)}
 .stat{display:flex;align-items:baseline;gap:8px}
 .stat strong{font-family:var(--f-display);font-weight:800;font-size:28px;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
-.note{font-size:13px;color:var(--muted)}
-.sample{margin-top:8px;border:1px dashed var(--accent);background:transparent;color:var(--accent);border-radius:8px;padding:6px 12px;font-weight:600}
 footer{border-top:1px solid var(--line);padding-block:12px calc(12px + env(safe-area-inset-bottom,0px));display:grid;gap:10px}
 .chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .chips .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-right:2px}
@@ -78,21 +73,17 @@ footer{border-top:1px solid var(--line);padding-block:12px calc(12px + env(safe-
 #text:focus{outline:none}
 .send{flex:none;border:0;background:var(--accent);color:var(--accent-fg);font-weight:600;border-radius:10px;height:40px;padding:0 16px}
 .send:disabled{opacity:.45;cursor:not-allowed}
+  [hidden] { display: none !important; }
 </style>
+</head>
+<body>
 
 <div class="app">
   <header>
     <div class="logo"><span class="bar" aria-hidden="true"></span>Kitakaró<em>AI</em></div>
-    <div class="status"><span class="dot" id="dot"></span><span id="mode">demó mód</span></div>
+    <div class="status"><span class="dot" id="dot"></span><span id="mode">modell csatlakoztatva</span></div>
     <button class="iconbtn" id="themeBtn" aria-label="Téma váltása">☀ Világos</button>
-    <button class="iconbtn" id="setBtn" aria-expanded="false">Beállítások</button>
   </header>
-
-  <section id="settings" hidden>
-    <label for="api">Modell API címe</label>
-    <input id="api" placeholder="pl. http://localhost:5000/censor  (üresen: demó mód)">
-    <p>A weboldal <code>POST</code> kérésben küldi: <code>image</code>, <code>target</code>, <code>style</code>. Válasz JSON: <code>{"detections":[{"bbox":[x1,y1,x2,y2]}]}</code> (a darabszám ebből jön), vagy <code>{"image":"&lt;base64&gt;","detections":3}</code>, ha a modell maga takar ki.</p>
-  </section>
 
   <main id="log" aria-live="polite"></main>
 
@@ -122,7 +113,8 @@ footer{border-top:1px solid var(--line);padding-block:12px calc(12px + env(safe-
 <script>
 const $=s=>document.querySelector(s);
 const log=$('#log'), fileIn=$('#file'), text=$('#text'), send=$('#send');
-let pending=null; // {blob,url,name}
+const API='/censor';
+let pending=null;
 const state={target:'arc',style:'pixel'};
 const TARGET_NAME={arc:'Csak arc',test:'Teljes test',rendszam:'Rendszám'};
 const NOUN={arc:'arcot',test:'személyt',rendszam:'rendszámot'};
@@ -136,15 +128,6 @@ function paintThemeBtn(){themeBtn.textContent=curTheme()==='dark'?'☀ Világos'
 try{const t=localStorage.getItem('censorTheme');if(t)root.dataset.theme=t}catch(e){}
 paintThemeBtn();
 themeBtn.onclick=()=>{const t=curTheme()==='dark'?'light':'dark';root.dataset.theme=t;try{localStorage.setItem('censorTheme',t)}catch(e){}paintThemeBtn()};
-
-/* ---------- beállítások ---------- */
-let API='';
-try{API=localStorage.getItem('censorApi')||''}catch(e){}
-$('#api').value=API;
-function refreshMode(){$('#mode').textContent=API?'modell csatlakoztatva':'demó mód';$('#dot').classList.toggle('live',!!API)}
-refreshMode();
-$('#setBtn').onclick=()=>{const s=$('#settings');s.hidden=!s.hidden;$('#setBtn').setAttribute('aria-expanded',!s.hidden)};
-$('#api').oninput=e=>{API=e.target.value.trim();try{localStorage.setItem('censorApi',API)}catch(_){}refreshMode()};
 
 /* ---------- chipek ---------- */
 function chipGroup(id,key){document.querySelectorAll(id+' .chip').forEach(b=>b.onclick=()=>{
@@ -170,7 +153,15 @@ function setPending(blob,name){
 }
 $('#attach').onclick=()=>fileIn.click();
 fileIn.onchange=()=>{const f=fileIn.files[0];if(f)setPending(f,f.name);fileIn.value=''};
-$('#premove').onclick=()=>{pending=null;$('#preview').hidden=true;send.disabled=true};
+$('#premove').onclick = () => {
+  if (pending) URL.revokeObjectURL(pending.url);
+  pending = null;
+  $('#pimg').removeAttribute('src');
+  $('#pname').textContent = '';
+  $('#preview').hidden = true;
+  fileIn.value = '';
+  send.disabled = true;
+};
 const comp=$('#composer');
 ['dragover','dragenter'].forEach(e=>comp.addEventListener(e,ev=>{ev.preventDefault();comp.classList.add('drag')}));
 ['dragleave','drop'].forEach(e=>comp.addEventListener(e,()=>comp.classList.remove('drag')));
@@ -180,64 +171,23 @@ text.addEventListener('input',()=>{text.style.height='auto';text.style.height=te
 text.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();if(!send.disabled)go()}});
 send.onclick=go;
 
-/* ---------- kép betöltése ---------- */
-const loadImg=url=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});
-
-/* ---------- kitakarás a böngészőben a kapott dobozok alapján ---------- */
-function censor(img,boxes,style){
-  const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;
-  const x=c.getContext('2d');x.drawImage(img,0,0);
-  for(const b0 of boxes){
-    let b={...b0};
-    if(b.w<=1&&b.h<=1){b.x*=c.width;b.y*=c.height;b.w*=c.width;b.h*=c.height} // arányos koordináták
-    b.x=Math.max(0,b.x);b.y=Math.max(0,b.y);b.w=Math.min(c.width-b.x,b.w);b.h=Math.min(c.height-b.y,b.h);
-    if(b.w<1||b.h<1)continue;
-    if(style==='bar'){x.fillStyle='#000';x.fillRect(b.x,b.y,b.w,b.h)}
-    else if(style==='blur'){
-      x.save();x.beginPath();x.rect(b.x,b.y,b.w,b.h);x.clip();
-      x.filter=`blur(${Math.max(8,Math.round(Math.min(b.w,b.h)/6))}px)`;x.drawImage(img,0,0);x.restore();x.filter='none';
-    }else{
-      const n=Math.max(6,Math.round(Math.min(b.w,b.h)/10)); // blokkméret
-      const t=document.createElement('canvas');t.width=Math.ceil(b.w/n);t.height=Math.ceil(b.h/n);
-      t.getContext('2d').drawImage(c,b.x,b.y,b.w,b.h,0,0,t.width,t.height);
-      x.imageSmoothingEnabled=false;x.drawImage(t,0,0,t.width,t.height,b.x,b.y,b.w,b.h);x.imageSmoothingEnabled=true;
-    }
-  }
-  return c;
-}
-
-/* ---------- doboz formátumok egységesítése: {x,y,w,h} | {x1,y1,x2,y2} | {bbox:[x1,y1,x2,y2]} | [x1,y1,x2,y2] ---------- */
-function normBox(d){
-  const a=Array.isArray(d)?d:(Array.isArray(d.bbox)?d.bbox:(Array.isArray(d.box)?d.box:null));
-  if(a&&a.length>=4)return {x:a[0],y:a[1],w:a[2]-a[0],h:a[3]-a[1],label:d.label};
-  if('x1' in d)return {x:d.x1,y:d.y1,w:d.x2-d.x1,h:d.y2-d.y1,label:d.label};
-  if('x' in d&&'w' in d)return d;
-  if('x' in d&&'width' in d)return {x:d.x,y:d.y,w:d.width,h:d.height,label:d.label};
-  return null;
-}
-
-/* ---------- modell hívása (vagy demó) ---------- */
-async function callModel(blob,target,style,demoBoxes){
-  if(!API){
-    await new Promise(r=>setTimeout(r,900));
-    const def=target==='test'?{x:.3,y:.1,w:.4,h:.85}:target==='rendszam'?{x:.4,y:.62,w:.2,h:.08}:{x:.38,y:.12,w:.24,h:.28};
-    return {boxes:demoBoxes||[{...def,label:target}],demo:true};
-  }
-  const fd=new FormData();fd.append('image',blob,'kep.png');fd.append('target',target);fd.append('style',style);
+/* ---------- modell hívása ---------- */
+async function callModel(blob,target,style){
+  const fd=new FormData();
+  fd.append('image',blob,'kep.png');
+  fd.append('target',target);
+  fd.append('style',style);
   const r=await fetch(API,{method:'POST',body:fd});
-  if(!r.ok)throw new Error(`A szerver ${r.status} hibakóddal válaszolt.`);
-  const ct=r.headers.get('content-type')||'';
-  if(ct.startsWith('image/'))return {image:await r.blob()};
   const j=await r.json();
-  const det=j.detections;
-  const boxes=(j.boxes||(Array.isArray(det)?det:[])).map(normBox).filter(Boolean);
-  const count=Array.isArray(det)?det.length:(typeof det==='number'?det:(j.boxes?j.boxes.length:null));
-  if(j.image)return {imageUrl:j.image.startsWith('data:')?j.image:'data:image/png;base64,'+j.image,count};
-  return {boxes,count:count??boxes.length};
+  if(!r.ok)throw new Error(j.error||`A szerver ${r.status} hibakóddal válaszolt.`);
+  return {
+    imageUrl:j.image.startsWith('data:')?j.image:'data:image/png;base64,'+j.image,
+    count:j.detections
+  };
 }
 
 /* ---------- egy kör ---------- */
-async function go(demoBoxes){
+async function go(){
   if(!pending)return;
   const p=pending, prompt=text.value.trim(), target=state.target, style=state.style;
   const fig=document.createElement('figure');fig.className='shot';fig.style.margin='0';
@@ -246,48 +196,32 @@ async function go(demoBoxes){
   pending=null;$('#preview').hidden=true;send.disabled=true;text.value='';text.style.height='auto';
   const wait=addMsg('bot','<span class="typing"><span></span><span></span><span></span></span>');
   try{
-    const res=await callModel(p.blob,target,style,typeof demoBoxes==='function'?demoBoxes(target):null);
+    const res=await callModel(p.blob,target,style);
     const out=document.createElement('figure');out.className='shot';out.style.margin='0';
-    let node, count='';
-    if(res.image||res.imageUrl){node=new Image();node.src=res.image?URL.createObjectURL(res.image):res.imageUrl;node.alt='Kitakart kép';if(res.count!=null)count=res.count}
-    else{const img=await loadImg(p.url);node=censor(img,res.boxes,style);count=res.count??res.boxes.length}
+    const node=new Image();
+    node.src=res.imageUrl;
+    node.alt='Kitakart kép';
     out.appendChild(node);
+    const count=res.count;
     const cap=document.createElement('figcaption');
-    cap.innerHTML=`<span class="tag">${TARGET_NAME[target]}</span><span>${style==='pixel'?'pixeles':style==='blur'?'elmosás':'fekete sáv'}</span>${count!==''?`<span>${count} objektum</span>`:''}${res.demo?'<span>demó eredmény</span>':''}`;
+    cap.innerHTML=`<span class="tag">${TARGET_NAME[target]}</span><span>${style==='pixel'?'pixeles':style==='blur'?'elmosás':'fekete sáv'}</span><span>${count} objektum</span>`;
     const dl=document.createElement('button');dl.className='dl';dl.textContent='Megnyitás új lapon';
-    dl.onclick=()=>{const src=node.tagName==='CANVAS'?node.toDataURL('image/png'):node.src;const a=document.createElement('a');a.href=src;a.target='_blank';a.rel='noopener';a.click()};
+    dl.onclick=()=>{const a=document.createElement('a');a.href=node.src;a.target='_blank';a.rel='noopener';a.click()};
     cap.appendChild(dl);out.appendChild(cap);
     wait.remove();
     const noun=NOUN[target];
-    let msg;
-    if(count===0)msg=`<p>Nem találtam ${NONE[target]} a képen, így nem takartam ki semmit.</p>`;
-    else if(count==='')msg='<p>Kész, kitakartam a kért részt.</p>';
-    else msg=`<p class="stat"><strong>${count}</strong> ${noun} takartam ki.</p>`;
-    if(res.demo)msg+='<p class="note">Ez még demó eredmény, a modell nincs bekötve.</p>';
+    const msg=count===0
+      ?`<p>Nem találtam ${NONE[target]} a képen, így nem takartam ki semmit.</p>`
+      :`<p class="stat"><strong>${count}</strong> ${noun} takartam ki.</p>`;
     addMsg('bot',msg,out);
-  }catch(e){wait.remove();addMsg('bot',`<p class="err">${esc(e.message||'Nem sikerült elérni a modellt.')} Ellenőrizd az API címét a Beállításokban.</p>`)}
+  }catch(e){
+    wait.remove();
+    addMsg('bot',`<p class="err">${esc(e.message||'Hiba történt a képfeldolgozás során.')}</p>`);
+  }
 }
-
-/* ---------- mintakép (rajzolt alak) ---------- */
-function makeSample(){
-  const c=document.createElement('canvas');c.width=800;c.height=520;const x=c.getContext('2d');
-  const g=x.createLinearGradient(0,0,0,520);g.addColorStop(0,'#bfd8ea');g.addColorStop(.75,'#e7eef3');g.addColorStop(.75,'#9aa58a');g.addColorStop(1,'#7d8a6c');
-  x.fillStyle=g;x.fillRect(0,0,800,520);
-  x.fillStyle='#3d4a63';x.beginPath();x.roundRect(345,420,45,85,10);x.roundRect(410,420,45,85,10);x.fill(); // lábak
-  x.fillStyle='#c2185b';x.beginPath();x.roundRect(320,200,160,235,40);x.fill(); // törzs
-  x.beginPath();x.roundRect(285,215,40,160,20);x.roundRect(475,215,40,160,20);x.fill(); // karok
-  x.fillStyle='#e8b796';x.beginPath();x.arc(400,140,58,0,7);x.fill(); // fej
-  x.fillStyle='#4a3022';x.beginPath();x.arc(400,122,60,Math.PI,0);x.fill(); // haj
-  x.fillStyle='#222';x.beginPath();x.arc(380,145,6,0,7);x.arc(420,145,6,0,7);x.fill();
-  x.strokeStyle='#8a4a3a';x.lineWidth=4;x.beginPath();x.arc(400,162,16,.15*Math.PI,.85*Math.PI);x.stroke();
-  return new Promise(r=>c.toBlob(r,'image/png'));
-}
-const SAMPLE_BOXES={arc:[{x:336,y:60,w:128,h:145,label:'arc'}],test:[{x:280,y:58,w:240,h:452,label:'test'}],rendszam:[]};
 
 /* ---------- nyitó üzenet ---------- */
-const intro=addMsg('bot','<p>Szia! Tölts fel egy képet (vagy húzd ide, illetve illeszd be), válaszd ki, hogy csak az arcot vagy a teljes testet takarjam ki, és küldd el.</p><p>A modell most még nincs bekötve, ezért demó módban futok.</p>');
-const sb=document.createElement('button');sb.className='sample';sb.textContent='Kipróbálom egy mintaképpel';
-sb.onclick=async()=>{const blob=await makeSample();setPending(blob,'minta_alak.png');
-  go(API?null:t=>SAMPLE_BOXES[t]);};
-intro.querySelector('.bubble').appendChild(sb);
+addMsg('bot','<p>Szia! Tölts fel egy képet (vagy húzd ide, illetve illeszd be), válaszd ki alul, hogy <strong>arcot</strong>, <strong>teljes testet</strong> vagy <strong>rendszámot</strong> takarjak ki, majd nyomj a Küldésre!</p>');
 </script>
+</body>
+</html>
