@@ -116,3 +116,22 @@ Teszek bele egy világos/sötét váltógombot a fejlécbe, ami megjegyzi a vál
 File
 Bekerült: a fejlécben a Beállítások mellett van egy gomb, amivel világos és sötét mód között lehet váltani. Alapból a gép rendszertémáját követi, kattintás után pedig megjegyzi a választást, így újratöltés után is az marad. A frissített index.html-t is elküldtem, ha a projektbe a fájlt teszitek be.
 
+Prompt:
+
+> „Készís a Dokumentáció alapján egy látványos jól értelmezhető prezentációt”
+
+FIle
+Elkészült a 13 diás prezentáció. Szellős, kevés szöveges diák, a Kitakaró saját színeivel (sötét alap, magenta kiemelés).
+
+Melyik dia melyik követelményt fedi le:
+
+#	Követelmény	Dia
+1	Probléma	Idegen arcok és rendszámok a megosztott képeken
+2	Választott megoldás	Feltöltés, választás, kész (képernyőképpel)
+3	Program felépítése	Négy modul, egy konténerben (ábra)
+4	Technikai megoldások	Arckivágás a dobozarányból · méretfüggő kitakarás · REST API és Cloud Run (3 dia)
+5	Modell és eredmények	Két előre betanított detektor · 11/12 sikeres próba, 28 arc · korlátok (3 dia)
+6	Demonstráció	Élő bemutató: QR-kód, cím és a bemutatás sorrendje
+7	MI-eszközök	Gemini a backendhez, Claude a felülethez, telepítéshez és dokumentációhoz
+
+Amit pótolnod kell a címdián: [tárgy neve] és a két [csapattag].
