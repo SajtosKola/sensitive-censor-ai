@@ -75,3 +75,44 @@ A generált forráskódokat lépésről lépésre átnéztük, működésüket �
 -Átlátjuk a Pillow `crop`, `filter` és `paste` metódusainak koordináta-kezelését.
 
 -Ismerjük a Flask REST API működését, a többkomponensű űrlapadatok (`multipart/form-data`) kezelését és a Base64 kódolású képtovábbítást.
+
+
+Prompt:
+
+> „ellenörízd, h minden benne van-e a doksiban.
+Szöveg kontextusát is ellenőrízd”
+
+Kapott eredmény:  
+
+Átnéztem a Kitakaró AI – Projektdokumentáció-t a követelmények alapján, és összevetettem a repóban lévő kóddal is.
+
+A kért tartalom megvan, mind a hét pont:
+
+Követelmény	Fejezet
+Probléma és cél	1.
+AI-modellek, eszközök, technológiák	2.
+Felépítés, feldolgozás fő lépései	3. (folyamatábrával)
+Megvalósítás, saját fejlesztés	4.
+Tesztelés, eredmények, korlátok	5. (táblázat + 4 képernyőkép)
+Munkamegosztás	6.
+Források, külső kódok, modellek	7.
+
+A számok egyeznek a kóddal: a fejrész-szűkítés arányai és százalékai, az elmosás és a pixelezés képlete, a 0,4-es küszöb, a végpont paraméterei és a válasz formátuma is.
+
+Négy helyen pontosítottam a szövegen:
+
+A tesztelésnél az állt, hogy „mindhárom célponttal és stílussal” teszteltetek, pedig nem minden kombinációt próbáltatok ki. Most az áll ott: „összesen 12 célpont–stílus kombinációban”. A hibánál a „tárhely kéréskorlátja” helyett „Cloud Run kéréskorlátja” szerepel.
+Azt írtam, hogy ellenőriztétek, egyezik-e a darabszám a képen láthatóval. A 28 arcos csoportképnél ezt valószínűleg senki nem számolta meg egyenként, ezért most az áll: „reális-e a kiírt darabszám”.
+A „néhány másodperc alatt visszakapja” helyére „rövid várakozás után” került, mert a hidegindítás 30–60 másodperc is lehet, és ez az 5. fejezetben szerepel is. Így a kettő nem mond ellent egymásnak.
+A korlátoknál a „néhány másodperc” feldolgozási idő mért adatnak tűnt, pedig nem mértük, ezt is kivettem.
+
+
+Prompt:
+
+> „light mode legyen benne”
+
+Kapott eredmény:  
+Teszek bele egy világos/sötét váltógombot a fejlécbe, ami megjegyzi a választást.
+File
+Bekerült: a fejlécben a Beállítások mellett van egy gomb, amivel világos és sötét mód között lehet váltani. Alapból a gép rendszertémáját követi, kattintás után pedig megjegyzi a választást, így újratöltés után is az marad. A frissített index.html-t is elküldtem, ha a projektbe a fájlt teszitek be.
+
