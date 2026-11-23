@@ -109,12 +109,13 @@ A korlátoknál a „néhány másodperc” feldolgozási idő mért adatnak tű
 
 Prompt:
 
-> „light mode legyen benne”
+> „készísd el a weboldal css-et”
 
-Kapott eredmény:  
-Teszek bele egy világos/sötét váltógombot a fejlécbe, ami megjegyzi a választást.
-File
-Bekerült: a fejlécben a Beállítások mellett van egy gomb, amivel világos és sötét mód között lehet váltani. Alapból a gép rendszertémáját követi, kattintás után pedig megjegyzi a választást, így újratöltés után is az marad. A frissített index.html-t is elküldtem, ha a projektbe a fájlt teszitek be.
+Kivettem a stílusokat az index.html-ből egy külön style.css-be. Áttekinthetően tagoltam, és minden részhez magyar megjegyzést írtam (színek, sötét téma, fejléc, üzenetek, képek, beviteli sáv). Az index.html-ben a régi <style> blokk helyén most egyetlen sor hivatkozik a fájlra.
+
+Kipróbáltam: a szerver kiszolgálja a /static/style.css-t, és böngészőben összevetettem a régi és az új oldalt. Minden elem kinézete pontosan ugyanaz, világos és sötét módban is.
+file
+
 
 Prompt:
 
