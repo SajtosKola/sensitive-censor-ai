@@ -1,7 +1,7 @@
 # 🛡️ Kitakaró AI – Automatikus Képcenzúrázó Alkalmazás
 
 Egy Python-alapú webalkalmazás, amely a Hugging Face előre betanított mesterséges intelligencia modelljeit felhasználva automatikusan detektálja és kitakarja a képeken szereplő érzékeny adatokat (személyek arcát, teljes alakját vagy gépjárművek rendszámtábláit).
-
+https://kitakaro-806290860448.europe-west1.run.app
 ---
 
 ## ✨ Főbb funkciók
