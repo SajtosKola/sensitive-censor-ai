@@ -33,8 +33,14 @@ https://kitakaro-806290860448.europe-west1.run.app
 ## 📁 A projekt felépítése
 
 ```text
-├── detector.py        # AI modellek betöltése és az érzékeny koordináták kinyerése
-├── censor.py          # Képfeldolgozási logika, fejrész-szűkítés és maszkolási effektusok
-├── app.py             # Flask webszerver és API végpont a frontend kiszolgálásához
-├── index.html         # Webes felhasználói felület
-└── requirements.txt   # Szükséges Python csomagok listája
+sensitive-censor-ai/
+├── app.py            # Flask szerver, GET / és POST /censor
+├── censor.py         # process_image(), apply_censor_to_boxes()
+├── detector.py       # modellek betöltése, detect_sensitive_areas()
+├── index.html        # webes felület
+├── requirements.txt  # Python függőségek
+├── Dockerfile        # konténer a Cloud Run-hoz
+├── .dockerignore     # amit a konténer nem kap meg
+├── AI_USAGE.md       # az MI-eszközök használatának leírása
+├── README.md
+└── .gitignore        # *.jpg is ki van zárva (tesztképek)
