@@ -206,8 +206,11 @@ async function go(){
     const cap=document.createElement('figcaption');
     cap.innerHTML=`<span class="tag">${TARGET_NAME[target]}</span><span>${style==='pixel'?'pixeles':style==='blur'?'elmosás':'fekete sáv'}</span><span>${count} objektum</span>`;
     const dl=document.createElement('button');dl.className='dl';dl.textContent='Megnyitás új lapon';
-    dl.onclick=()=>{const a=document.createElement('a');a.href=node.src;a.target='_blank';a.rel='noopener';a.click()};
-    cap.appendChild(dl);out.appendChild(cap);
+    const toBlobUrl=()=>{const b64=node.src.split(',')[1];const bin=atob(b64);const arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);return URL.createObjectURL(new Blob([arr],{type:'image/png'}))};
+    dl.onclick=()=>{const url=toBlobUrl();window.open(url,'_blank')};
+    const save=document.createElement('button');save.className='dl';save.textContent='Letöltés';save.style.marginLeft='6px';
+    save.onclick=()=>{const a=document.createElement('a');a.href=toBlobUrl();a.download='kitakart_kep.png';document.body.appendChild(a);a.click();a.remove()};
+    cap.appendChild(dl);cap.appendChild(save);out.appendChild(cap);
     wait.remove();
     const noun=NOUN[target];
     const msg=count===0
